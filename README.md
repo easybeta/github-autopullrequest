@@ -15,8 +15,8 @@ Examples of Interesting Items:
 raise
 .write
 
-Example
+Example:
 > review puppetlabs/puppet
-https://github.com/puppetlabs/puppet/pull/16663 - Interesting
-https://github.com/puppetlabs/puppet/pull/16600 - Not Interesting
-https://github.com/puppetlabs/puppet/pull/16598 - Not Interesting
+> https://github.com/puppetlabs/puppet/pull/16663 - Interesting
+> https://github.com/puppetlabs/puppet/pull/16600 - Not Interesting
+> https://github.com/puppetlabs/puppet/pull/16598 - Not Interesting
