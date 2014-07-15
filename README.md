@@ -11,9 +11,9 @@ Examples of Interesting Items:
 - Any change to the specified files
 - Does not contain changes to any files in the specified directory
 - Any added or deleted lines contain the follow words (not as substrings of larger words):
-/dev/null
-raise
-.write
+/dev/null<br>
+raise<br>
+.write<br>
 
 Example:
 > review puppetlabs/puppet <br>
