@@ -1,4 +1,4 @@
-github-autopullrequest.py - Created by Eric Betancourt [betancourt.eric.s@gmail.com]
+github-autopullrequest.py
 ================
 
 This script helps automate code reviews of pull requests to a specified GitHub repositories.
