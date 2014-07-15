@@ -16,7 +16,7 @@ raise
 .write
 
 Example:
-> review puppetlabs/puppet
-> https://github.com/puppetlabs/puppet/pull/16663 - Interesting
-> https://github.com/puppetlabs/puppet/pull/16600 - Not Interesting
-> https://github.com/puppetlabs/puppet/pull/16598 - Not Interesting
+> review puppetlabs/puppet <br>
+> https://github.com/puppetlabs/puppet/pull/16663 - Interesting <br>
+> https://github.com/puppetlabs/puppet/pull/16600 - Not Interesting <br>
+> https://github.com/puppetlabs/puppet/pull/16598 - Not Interesting <br>
