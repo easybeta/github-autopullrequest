@@ -1,0 +1,14 @@
+{
+    "workingDirectory": "puppetlabs/puppet",
+    "verbose": true,
+    "interestingItems": [
+    	{ "type": "fileChange", "keyword": "spec/", "modifyOk": false },
+        { "type": "fileChange", "keyword": "Gemfile", "modifyOk": true },
+        { "type": "fileChange", "keyword": ".gemspec", "modifyOk": true },
+        { "type": "lineKeyword",  "keyword": "/dev/null", "modifyOk": true },
+        { "type": "lineKeyword",  "keyword": "raise", "modifyOk": true },
+        { "type": "lineKeyword",  "keyword": ".write", "modifyOk": true },
+        { "type": "lineKeyword",  "keyword": "%x", "modifyOk": true },
+        { "type": "lineKeyword",  "keyword": "exec", "modifyOk": true }
+    ]   
+}
