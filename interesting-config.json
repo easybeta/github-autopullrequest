@@ -1,5 +1,7 @@
 {
-    "workingDirectory": "puppetlabs/puppet",
+    "workingDirectory": [ 
+        {"name": "cuckoobox/cuckoo"},
+        {"name": "puppetlabs/puppet"} ],
     "verbose": true,
     "interestingItems": [
     	{ "type": "fileChange", "keyword": "spec/", "modifyOk": false },
@@ -9,6 +11,5 @@
         { "type": "lineKeyword",  "keyword": "raise", "modifyOk": true },
         { "type": "lineKeyword",  "keyword": ".write", "modifyOk": true },
         { "type": "lineKeyword",  "keyword": "%x", "modifyOk": true },
-        { "type": "lineKeyword",  "keyword": "exec", "modifyOk": true }
-    ]   
+        { "type": "lineKeyword",  "keyword": "exec", "modifyOk": true } ]   
 }
