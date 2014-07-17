@@ -16,8 +16,8 @@ raise<br>
 .write
 
 Example:
-> review puppetlabs/puppet <br>
+> review cuckoobox/cuckoo <br>
 > https://api.github.com/repos/cuckoobox/cuckoo/pulls/310 - Not Interesting<br>
 > https://api.github.com/repos/cuckoobox/cuckoo/pulls/308 - Interesting<br>
-> &nbsp&nbsp&nbsp Found {'+':'raise'} on line 30 in modules/processing/analysisinfo.py<br>
-> &nbsp&nbsp&nbsp Found {'+':'raise'} on line 33 in modules/processing/analysisinfo.py
+>     Found {'+':'raise'} on line 30 in modules/processing/analysisinfo.py<br>
+>     Found {'+':'raise'} on line 33 in modules/processing/analysisinfo.py
