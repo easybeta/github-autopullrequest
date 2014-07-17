@@ -8,7 +8,7 @@ the open pull request contain 'interesting items', which will be specified in co
 titled "interesting-config.json".
 
 Examples of Interesting Items:
-- Any change to the specified files
+- Any change to the specified files or directories
 - Does not contain changes to any files in the specified directory
 - Any added or deleted lines contain the follow words (not as substrings of larger words):
 /dev/null
@@ -16,10 +16,11 @@ raise
 .write
 
 Example
-> review puppetlabs/puppet
-https://github.com/puppetlabs/puppet/pull/16663 - Interesting
-https://github.com/puppetlabs/puppet/pull/16600 - Not Interesting
-https://github.com/puppetlabs/puppet/pull/16598 - Not Interesting
+> review cuckoobox/cuckoo
+https://api.github.com/repos/cuckoobox/cuckoo/pulls/310 - Not Interesting
+https://api.github.com/repos/cuckoobox/cuckoo/pulls/308 - Interesting
+	Found {'+':'raise'} on line 30 in modules/processing/analysisinfo.py
+	Found {'+':'raise'} on line 33 in modules/processing/analysisinfo.py
 '''
 
 #! /usr/bin/python
@@ -32,8 +33,8 @@ import json
 config_file = 'interesting-config.json'
 
 # Default Working Directory
-working_dir = '' #'puppetlabs/puppet'
-verbose = '' #False
+working_dir = []
+verbose = True
 interestingItems = []
 
 # Multiline compare checks n previous and upcoming lines around the line being compared.
@@ -146,7 +147,7 @@ def check_filename(html_request, filenames):
 
 # Determine Interesting by first pulling pulls 'files' JSON Data. Then call sub-functions check_filename() 
 # and search_keyword() to determine whether the pull is interesting.
-def determine_interesting(pull_id):
+def determine_interesting(pull_id, curr_working_dir):
     interest_found = 'Not Interesting'
     file_changes_good, file_changes_bad, line_keywords = [], [], []
     description = []
@@ -160,7 +161,7 @@ def determine_interesting(pull_id):
             line_keywords.append(item['keyword'])
       
     try:
-        html_request = requests.get('https://api.github.com/repos/%s/pulls/%d/files?page=%d&per_page=100' % (working_dir, pull_id, 1))
+        html_request = requests.get('https://api.github.com/repos/%s/pulls/%d/files?page=%d&per_page=100' % (curr_working_dir, pull_id, 1))
         if(html_request.ok and html_request.text != '[]'):
             # Any change to these files or directories:
             result, output = check_filename(html_request, file_changes_good)
@@ -181,7 +182,7 @@ def determine_interesting(pull_id):
                 interest_found = 'Interesting'
                 description.extend(output)
     except Exception as e:
-        print "Error while executing github-autopullrequest.py during pull '%s/pulls/%d'." % (working_dir, pull_id)
+        print "Error while executing github-autopullrequest.py during pull '%s/pulls/%d'." % (curr_working_dir, pull_id)
         print e
             
     return interest_found, description 
@@ -189,55 +190,58 @@ def determine_interesting(pull_id):
 # Main class determines what pulls are related to the working_dir. It then determines the interesting
 # of each pull. Results with line number are then printed to the terminal.
 def main(argv):
-    global working_dir, verbose, interestingItems
-    pageNum = 1
+    global working_dirs, verbose, interestingItems
 
     try:
         with open(config_file, 'r') as json_data:
             readin = json.load(json_data)
-            working_dir = readin['workingDirectory']
+            working_dirs = readin['workingDirectory']
             verbose = readin['verbose']
             interestingItems = readin['interestingItems']
             if verbose:
-                print 'Working Directory:', working_dir
+                print 'Working Directory:'
+                for idx, line in enumerate(working_dirs):
+                    print '\t%s' % line['name']
                 print 'Verbose:', verbose
                 print 'Interesting Items:'
                 for idx, line in enumerate(interestingItems):
-                    print '%s - %s' % (line['type'], line['keyword'])
+                    print '\t%s - %s' % (line['type'], line['keyword'])
             json_data.close()
     except Exception as e:
         print e
-        
-    while True:
-        try:
-            r = requests.get('https://api.github.com/repos/%s/pulls?page=%d&per_page=100' % (working_dir, pageNum))
-            if(r.ok and r.text != '[]'):
-                
-                print "Pull Request Urls - '%s' - Page %d:" % (working_dir, pageNum)
-                idx = 0
-                while True:
-                    try:
-                        repoItem = json.loads(r.text or r.content)[idx]
-                        pull_interest, interest_description = determine_interesting(repoItem['number'])
-                        print repoItem['url'] + ' - ' + pull_interest
-                        for line in interest_description:
-                            print '\t' + line                
-                    except IndexError:
-                        break
-                    idx = idx + 1
-            else:
-                match = re.search('\"message\":\"(.*)\",', r.text)
-                if match:
-                    print "Unable to perform Pulls Request on '%s' - '%s'" % (working_dir, match.group(1))
+
+    for idx, dir in enumerate(working_dirs):
+        curr_dir = str(dir['name'])
+        pageNum = 1
+        while True:
+            try:
+                r = requests.get('https://api.github.com/repos/%s/pulls?page=%d&per_page=100' % (curr_dir, pageNum))
+                if(r.ok and r.text != '[]'):
+                    print "Pull Request Urls - '%s' - Page %d:" % (curr_dir, pageNum)
+                    idx = 0
+                    while True:
+                        try:
+                            repoItem = json.loads(r.text or r.content)[idx]
+                            pull_interest, interest_description = determine_interesting(repoItem['number'], curr_dir)
+                            print repoItem['url'] + ' - ' + pull_interest
+                            for line in interest_description:
+                                print '\t' + line                
+                        except IndexError:
+                            break
+                        idx = idx + 1
                 else:
-                    print "Pulls Requests Complete for '%s'." % working_dir
+                    match = re.search('\"message\":\"(.*)\",', r.text)
+                    if match:
+                        print "Unable to perform Pulls Request on '%s' - '%s'" % (curr_dir, match.group(1))
+                    else:
+                        print "Pulls Requests Complete for '%s'." % curr_dir
+                    break
+            except Exception as e:
+                print "Error while executing github-autopullrequest.py with directory '%s'." % curr_dir
+                print e
                 break
-        except Exception as e:
-            print "Error while executing github-autopullrequest.py with directory '%s'." % working_dir
-            print e
-            break
             
-        pageNum = pageNum + 1
+            pageNum = pageNum + 1
 
 if __name__ == '__main__':
     main(sys.argv)
